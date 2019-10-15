@@ -20,13 +20,22 @@
 
 project('obs-gstreamer', 'c')
 
+cc = meson.get_compiler('c')
+
+link_args = []
+if cc.has_link_argument('-Wl,--version-script,'+join_paths(meson.current_source_dir(), 'exports.gcc'))
+  link_args = '-Wl,--version-script,'+join_paths(meson.current_source_dir(), 'exports.gcc')
+elif host_machine.system() == 'darwin'
+  link_args = ['-exported_symbols_list', join_paths(meson.current_source_dir(), 'exports.macos')]
+endif
+
 shared_library('obs-gstreamer',
   'gstreamer.c',
   'gstreamer-source.c',
   'gstreamer-encoder.c',
   name_prefix : '',
   dependencies : [
-    meson.get_compiler('c').find_library('obs'),
+    cc.find_library('obs'),
     dependency('gstreamer-1.0'),
     dependency('gstreamer-video-1.0'),
     dependency('gstreamer-audio-1.0'),
@@ -34,4 +43,6 @@ shared_library('obs-gstreamer',
   ],
   install : true,
   install_dir : 'lib/obs-plugins',
+  link_args : link_args,
+  vs_module_defs : join_paths(meson.current_source_dir(), 'exports.def'),
 )

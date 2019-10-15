@@ -1,0 +1,9 @@
+{
+global:
+	obs_current_module;
+	obs_module_load;
+	obs_module_set_pointer;
+	obs_module_ver;
+local:
+	*;
+};
